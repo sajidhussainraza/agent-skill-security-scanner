@@ -1,0 +1,1 @@
+{"description":"Summarize a user-chosen PDF in plain language.","name":"pdf-summarizer","tools":["read","write"],"version":"1.0.0"}

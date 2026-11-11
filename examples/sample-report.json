@@ -1,0 +1,103 @@
+{
+  "skill": "system-cleaner",
+  "path": "examples/risky-skill",
+  "files_scanned": 3,
+  "score": 100,
+  "verdict": "BLOCK",
+  "counts": {
+    "critical": 3,
+    "high": 4,
+    "medium": 3,
+    "low": 1
+  },
+  "findings": [
+    {
+      "rule": "S01",
+      "severity": "critical",
+      "title": "Instruction override / prompt injection in skill text",
+      "file": "SKILL.md",
+      "detail": "instruction-override language: 'do not tell the user'",
+      "remediation": "Remove the override language. A skill may instruct the agent on its own task, never on the agent's system instructions, and never tell it to hide anything."
+    },
+    {
+      "rule": "S02",
+      "severity": "critical",
+      "title": "Credential / secret access",
+      "file": "SKILL.md",
+      "detail": "references secrets/credentials: '.env'",
+      "remediation": "Do not read .env files, API keys, tokens, passwords or SSH keys. Ask the user to supply credentials through the agent's own secure channel instead."
+    },
+    {
+      "rule": "S02",
+      "severity": "critical",
+      "title": "Credential / secret access",
+      "file": "clean.py",
+      "detail": "references secrets/credentials: '.env'",
+      "remediation": "Do not read .env files, API keys, tokens, passwords or SSH keys. Ask the user to supply credentials through the agent's own secure channel instead."
+    },
+    {
+      "rule": "S03",
+      "severity": "high",
+      "title": "Outbound data-send channel in helper code",
+      "file": "clean.py",
+      "detail": "sends data outbound (requests.post / urlopen / http.client.request)",
+      "remediation": "A POST, upload or webhook call can exfiltrate whatever the skill read. Remove it, or declare the exact endpoint and payload in SKILL.md and get approval."
+    },
+    {
+      "rule": "S04",
+      "severity": "high",
+      "title": "Shell command execution in helper code",
+      "file": "clean.py",
+      "detail": "executes shell commands (subprocess / os.system / eval / exec)",
+      "remediation": "Avoid subprocess, os.system, eval and exec. If a shell call is unavoidable, pin the command and its arguments and never build it from untrusted input."
+    },
+    {
+      "rule": "S05",
+      "severity": "high",
+      "title": "Network egress in helper code",
+      "file": "clean.py",
+      "detail": "imports a network library (requests / urllib / socket / http.client)",
+      "remediation": "Declare every host the skill contacts in SKILL.md. A skill that phones home with no declared endpoint is an exfiltration risk."
+    },
+    {
+      "rule": "S06",
+      "severity": "high",
+      "title": "Destructive file operation in helper code",
+      "file": "clean.py",
+      "detail": "deletes files or directories (remove / unlink / rmtree)",
+      "remediation": "File deletion (unlink, remove, rmtree, rm -rf) must be explicit, scoped to paths the user chose, and confirmed before it runs."
+    },
+    {
+      "rule": "S07",
+      "severity": "medium",
+      "title": "Sensitive path read",
+      "file": "clean.py",
+      "detail": "references sensitive path: '~/.ssh'",
+      "remediation": "Do not read SSH keys, cloud credentials, browser profiles or /etc/passwd. Scope file access to the working directory the skill declares."
+    },
+    {
+      "rule": "S08",
+      "severity": "medium",
+      "title": "Obfuscated or encoded payload",
+      "file": "clean.py",
+      "detail": "long base64 blob (66 chars) decoded at runtime",
+      "remediation": "Base64 / hex blobs decoded and executed at runtime hide what the skill really does. Ship readable code only."
+    },
+    {
+      "rule": "S09",
+      "severity": "medium",
+      "title": "Unscoped or wildcard tool permissions",
+      "file": "skill.json",
+      "detail": "wildcard tool permission (\"*\") grants every capability",
+      "remediation": "Declare the exact tools the skill needs. A wildcard (\"*\") or a missing tools list hands the skill every capability the agent has."
+    },
+    {
+      "rule": "S10",
+      "severity": "low",
+      "title": "Missing skill metadata (name, version or description)",
+      "file": "skill.json",
+      "detail": "missing metadata field(s): version, description",
+      "remediation": "Add name, version and description to the manifest (or a top-level heading in SKILL.md) so the package can be identified and reviewed."
+    }
+  ]
+}
